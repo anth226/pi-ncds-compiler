@@ -1115,6 +1115,7 @@ export const consumer_17 = Consumer.create({
     );
 
     if (performance) {
+      let perf_today = performance.price_percent_change_today;
       let perf_7_days = performance.price_percent_change_7_days;
       let perf_14_days = performance.price_percent_change_14_days;
       let perf_30_days = performance.price_percent_change_30_days;
@@ -1126,6 +1127,7 @@ export const consumer_17 = Consumer.create({
 
       await securities.insertPerformanceSecurity(
         sqsMessage.ticker,
+        perf_today,
         perf_7_days,
         perf_14_days,
         perf_30_days,

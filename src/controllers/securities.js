@@ -342,7 +342,7 @@ export async function getSecurityPerformance(ticker) {
     }
 
     let perf = {
-      price_percent_change_today: (lastPrice / earliest.value - 1) * 100,
+      price_percent_change_today: ((lastPrice.last_price || earliest.value) / earliest.value - 1) * 100,
       price_percent_change_7_days: (earliest.value / weekPrice.value - 1) * 100,
       price_percent_change_14_days:
         (earliest.value / twoweekPrice.value - 1) * 100,

@@ -332,6 +332,8 @@ export async function getSecurityPerformance(ticker) {
 
     let open_price = cachedOpen || intrinioResponse.open_price;
 
+    console.log("open_price: ", open_price);
+
     if (open_price) {
       earliest = {
         date: estTimestamp,
@@ -340,6 +342,10 @@ export async function getSecurityPerformance(ticker) {
     } else {
       earliest = todayPrice;
     }
+
+    console.log("earliest: ", earliest);
+
+    console.log("today: ", ((lastPrice.last_price || earliest.value) / earliest.value - 1) * 100);
 
     let perf = {
       price_percent_change_today: ((lastPrice.last_price || earliest.value) / earliest.value - 1) * 100,

@@ -345,18 +345,25 @@ export async function getSecurityPerformance(ticker) {
 
     console.log("earliest: ", earliest);
 
+    var todayperf,
+        weekperf,
+        twoweekperf,
+        onemonthperf,
+        threemonthperf,
+        yearperf;
 
-
-    var today;
     if (earliest.value) {
-      today = ((lastPrice.last_price || earliest.value) / earliest.value - 1) * 100
-    } else {
-      today = 0;
+      todayperf = ((lastPrice.last_price || earliest.value) / earliest.value - 1) * 100;
+      weekperf = (earliest.value / weekPrice.value - 1) * 100;
+      twoweekperf = (earliest.value / twoweekPrice.value - 1) * 100;
+      onemonthperf = (earliest.value / monthPrice.value - 1) * 100;
+      threemonthperf = (earliest.value / threemonthPrice.value - 1) * 100;
+      yearperf = (earliest.value / latest.value - 1) * 100;
     }
 
-    console.log("today: ", today);
+    console.log("today: ", todayperf);
 
-    console.log("7_days: ", (earliest.value / weekPrice.value - 1) * 100)
+    console.log("7_days: ", weekperf);
 
     let perf = {
       price_percent_change_today: ((lastPrice.last_price || earliest.value) / earliest.value - 1) * 100,

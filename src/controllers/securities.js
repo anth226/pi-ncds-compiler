@@ -134,7 +134,7 @@ export async function insertPerformanceSecurity(
         price_percent_change_30_days = $4, 
         price_percent_change_3_months = $5, 
         price_percent_change_1_year = $6, 
-        perf_values = $7  
+        perf_values = $7,
         today_performance = $8
         WHERE ticker = $1
       `,

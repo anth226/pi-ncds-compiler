@@ -348,6 +348,14 @@ export async function getSecurityPerformance(ticker) {
       todayperf = ((lastPrice.last_price || earliest.value) / earliest.value - 1) * 100;
     }
 
+    console.log("what is inifinty");
+    console.log("today: ", todayperf);
+    console.log("week: ", (earliest.value / weekPrice.value - 1) * 100);
+    console.log("2week: ", (earliest.value / twoweekPrice.value - 1) * 100);
+    console.log("1month: ", (earliest.value / monthPrice.value - 1) * 100);
+    console.log("3month: ", (earliest.value / threemonthPrice.value - 1) * 100);
+    console.log("1year: ", (earliest.value / latest.value - 1) * 100);
+
     let perf = {
       price_percent_change_today: todayperf,
       price_percent_change_7_days: (earliest.value / weekPrice.value - 1) * 100,

@@ -224,7 +224,7 @@ export async function getClosestPriceDate(date, dailyData) {
       dpDate = strDate.slice(0, 10);
     }
 
-    return dpDate === current;
+    return (dpDate === current && dataPoint.value);
   });
 
   while (itemIndex < 0) {
@@ -246,7 +246,7 @@ export async function getClosestPriceDate(date, dailyData) {
         dpDate = strDate.slice(0, 10);
       }
 
-      return dpDate === current;
+      return (dpDate === current && dataPoint.value);
     });
 
     checks += 1;
@@ -269,6 +269,10 @@ export async function getSecurityPerformance(ticker) {
   }
 
   let dailyData = data.daily;
+
+  if (dailyData.length === 1 && !dailyData[0].value) {
+    return;
+  }
 
   let est = moment.tz("America/New_York").format("YYYY-MM-DD");
 
@@ -347,6 +351,13 @@ export async function getSecurityPerformance(ticker) {
     if (earliest.value) {
       todayperf = ((lastPrice.last_price || earliest.value) / earliest.value - 1) * 100;
     }
+
+    // console.log("today: ", todayperf);
+    // console.log("week: ", (earliest.value / weekPrice.value - 1) * 100);
+    // console.log("2week: ", (earliest.value / twoweekPrice.value - 1) * 100);
+    // console.log("1month: ", (earliest.value / monthPrice.value - 1) * 100);
+    // console.log("3month: ", (earliest.value / threemonthPrice.value - 1) * 100);
+    // console.log("1year: ", (earliest.value / latest.value - 1) * 100);
 
     let perf = {
       price_percent_change_today: todayperf,

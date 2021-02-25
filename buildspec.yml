@@ -8,8 +8,6 @@ phases:
   install:
     runtime-versions:
       nodejs: 10
-    commands:
-      - echo Hello, world!
   pre_build:
     commands:
       - echo Installing source NPM dependencies...
@@ -22,8 +20,10 @@ phases:
   post_build:
     commands:
       - echo Build completed on `date`
+      - touch .env
+cache:
+  paths:
+    - 'node_modules/**/*'
 artifacts:
   files:
-    - package.json
-    - build/**/*
-    - .ebextensions/*
+    - '**/*'

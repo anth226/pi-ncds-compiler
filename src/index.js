@@ -618,28 +618,28 @@ app.listen(process.env.PORT || 8080, () => {
   //training
   nlp.trainClassifier();
 
-  queue.consumer_1.start();
-  queue.consumer_2.start();
-  queue.consumer_3.start();
-  queue.consumer_4.start();
-  queue.consumer_5.start();
-  queue.consumer_6.start();
-  queue.consumer_7.start();
-  queue.consumer_8.start();
-  queue.consumer_9.start();
-  queue.consumer_10.start();
-  queue.consumer_11.start();
-  queue.consumer_12.start();
-  queue.consumer_13.start();
-  queue.consumer_14.start();
-  queue.consumer_15.start();
-  queue.consumer_16.start();
-  queue.consumer_17.start();
-  queue.consumer_18.start();
-  queue.consumer_19.start();
-  queue.consumer_20.start();
-  queue.consumer_21.start();
-  if (process.env.RELEASE_STAGE == "production") {
-    queue.newTickersConsumer.start();
-  }
+  // queue.consumer_1.start();
+  // queue.consumer_2.start();
+  // queue.consumer_3.start();
+  // queue.consumer_4.start();
+  // queue.consumer_5.start();
+  // queue.consumer_6.start();
+  // queue.consumer_7.start();
+  // queue.consumer_8.start();
+  // queue.consumer_9.start();
+  // queue.consumer_10.start();
+  // queue.consumer_11.start();
+  // queue.consumer_12.start();
+  // queue.consumer_13.start();
+  // queue.consumer_14.start();
+  // queue.consumer_15.start();
+  // queue.consumer_16.start();
+  // queue.consumer_17.start();
+  // queue.consumer_18.start();
+  // queue.consumer_19.start();
+  // queue.consumer_20.start();
+  // queue.consumer_21.start();
+  // if (process.env.RELEASE_STAGE == "production") {
+  //   queue.newTickersConsumer.start();
+  // }
 });

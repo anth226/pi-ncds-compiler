@@ -1307,64 +1307,64 @@ consumer_20.on("processing_error", (err) => {
 });
 
 // AWS_SQS_URL_INSTITUTIONS_SNAPSHOTS
-export const consumer_21 = Consumer.create({
-  queueUrl: process.env.AWS_SQS_URL_INSTITUTIONS_SNAPSHOTS,
-  handleMessage: async (message) => {
-    let sqsMessage = JSON.parse(message.Body);
+// export const consumer_21 = Consumer.create({
+//   queueUrl: process.env.AWS_SQS_URL_INSTITUTIONS_SNAPSHOTS,
+//   handleMessage: async (message) => {
+//     let sqsMessage = JSON.parse(message.Body);
 
-    console.log("sqsMessage--", sqsMessage);
+//     console.log("sqsMessage--", sqsMessage);
 
-    let strId = sqsMessage.id;
+//     let strId = sqsMessage.id;
 
-    let id = parseInt(strId);
+//     let id = parseInt(strId);
 
-    let snapshot = await institutions.getInstitutionSnapshot(id);
-    console.log("snapshot data")
+//     let snapshot = await institutions.getInstitutionSnapshot(id);
+//     console.log("snapshot data")
 
-    if (snapshot) {
-      let json = JSON.stringify(snapshot);
-      await institutions.insertSnapshotInstitution(id, json);
-    }
-  },
-});
+//     if (snapshot) {
+//       let json = JSON.stringify(snapshot);
+//       await institutions.insertSnapshotInstitution(id, json);
+//     }
+//   },
+// });
 
-consumer_21.on("error", (err) => {
-  console.error(err.message);
-});
+// consumer_21.on("error", (err) => {
+//   console.error(err.message);
+// });
 
-consumer_21.on("processing_error", (err) => {
-  console.error(err.message);
-});
+// consumer_21.on("processing_error", (err) => {
+//   console.error(err.message);
+// });
 
-export const newTickersConsumer = Consumer.create({
-  queueUrl: process.env.AWS_SQS_URL_PROCESS_NEW_SECURITY,
-  handleMessage: async (message) => {
-    let tickers = JSON.parse(message.Body);
+// export const newTickersConsumer = Consumer.create({
+//   queueUrl: process.env.AWS_SQS_URL_PROCESS_NEW_SECURITY,
+//   handleMessage: async (message) => {
+//     let tickers = JSON.parse(message.Body);
 
-    console.log("sqs-new-tickers-received");
+//     console.log("sqs-new-tickers-received");
 
-    if (!Array.isArray(tickers)) {
-      return;
-    }
+//     if (!Array.isArray(tickers)) {
+//       return;
+//     }
 
-    for(let index = 0; index < tickers.length; index++) {
-      const ticker = tickers[index].substring(1);
+//     for(let index = 0; index < tickers.length; index++) {
+//       const ticker = tickers[index].substring(1);
 
-      console.log("sqs-new-ticker-", ticker);
+//       console.log("sqs-new-ticker-", ticker);
 
-      try {
-        await securities.processNewTicker(ticker);
-      } catch (e) {
-        console.log(`Failed to add new ticker ${ticker}`, e);
-      }
-    }
-  },
-});
+//       try {
+//         await securities.processNewTicker(ticker);
+//       } catch (e) {
+//         console.log(`Failed to add new ticker ${ticker}`, e);
+//       }
+//     }
+//   },
+// });
 
-newTickersConsumer.on("error", (err) => {
-  console.error(err.message);
-});
+// newTickersConsumer.on("error", (err) => {
+//   console.error(err.message);
+// });
 
-newTickersConsumer.on("processing_error", (err) => {
-  console.error(err.message);
-});
+// newTickersConsumer.on("processing_error", (err) => {
+//   console.error(err.message);
+// });

@@ -11,11 +11,11 @@ export async function getRawData() {
   return result;
 }
 
-export async function getSmartTrade(optContract) {
+export async function getSmartTrade(optContract, time) {
   let result = await db2(`
     SELECT *
     FROM options
-    WHERE option_contract = '${optContract}'
+    WHERE option_contract = '${optContract}' AND time = ${time}
     `);
 
   return result[0];
@@ -28,15 +28,17 @@ export async function consolidate() {
 
   if (result && result.length > 0) {
     for (let i in result) {
+      let time = result[i].time;
       let optContract = result[i].option_contract;
-      if (smartTrades.has(optContract)) {
-        let trades = smartTrades.get(optContract);
+      let key = time + "-" + optContract;
+      if (smartTrades.has(key)) {
+        let trades = smartTrades.get(key);
         trades.push(result[i]);
-        smartTrades.set(optContract, trades);
+        smartTrades.set(key, trades);
       } else {
         let trades = [];
         trades.push(result[i]);
-        smartTrades.set(optContract, trades);
+        smartTrades.set(key, trades);
       }
     }
 
@@ -62,8 +64,8 @@ export async function consolidate() {
 
       let prem = contract_quantity * price_per_contract * 100;
 
-      let smTrade = await getSmartTrade(optContract);
-      //console.log("smTrade", smTrade);
+      let smTrade = await getSmartTrade(optContract, time);
+      console.log("smTrade", smTrade);
 
       if (smTrade) {
         //update

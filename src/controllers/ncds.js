@@ -1,11 +1,16 @@
 import db2 from "../db2";
 
-//TODO: add time check for getRawData
-
 export async function getRawData() {
+  const moment = require("moment-timezone");
+  let time = moment().tz("America/New_York").valueOf();
+  time = (time - (time % 1000)) / 1000;
+  //3600 = 1 hour
+  let offset = time - 600;
+
   let result = await db2(`
         SELECT *
         FROM options_raw
+        WHERE time > ${offset}
         `);
 
   return result;
@@ -65,7 +70,7 @@ export async function consolidate() {
       let prem = contract_quantity * price_per_contract * 100;
 
       let smTrade = await getSmartTrade(optContract, time);
-      console.log("smTrade", smTrade);
+      //console.log("smTrade", smTrade);
 
       if (smTrade) {
         //update

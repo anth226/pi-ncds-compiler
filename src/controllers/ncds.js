@@ -10,7 +10,7 @@ export async function getRawData() {
   let result = await db2(`
         SELECT *
         FROM options_raw
-        WHERE time > ${offset}
+        WHERE time > ${offset} AND is_processed = false
         `);
 
   return result;
@@ -33,6 +33,7 @@ export async function consolidate() {
 
   if (result && result.length > 0) {
     for (let i in result) {
+      let id = result[i].id;
       let time = result[i].time;
       let optContract = result[i].option_contract;
       let key = time + "-" + optContract;
@@ -45,6 +46,12 @@ export async function consolidate() {
         trades.push(result[i]);
         smartTrades.set(key, trades);
       }
+      //set is_processed to true
+      let query = {
+        text: "UPDATE options_raw SET is_processed = true WHERE id = $1",
+        values: [id],
+      };
+      await db2(query);
     }
 
     smartTrades.forEach(async (value, key) => {

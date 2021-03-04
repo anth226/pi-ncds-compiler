@@ -76,6 +76,10 @@ export async function consolidate() {
 
       let prem = contract_quantity * price_per_contract * 100;
 
+      if (prem < 3000) {
+        return;
+      }
+
       let smTrade = await getSmartTrade(optContract, time);
       //console.log("smTrade", smTrade);
 

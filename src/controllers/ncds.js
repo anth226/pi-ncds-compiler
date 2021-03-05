@@ -1,16 +1,18 @@
 import db2 from "../db2";
 
 export async function getRawData() {
-  const moment = require("moment-timezone");
-  let time = moment().tz("America/New_York").valueOf();
-  time = (time - (time % 1000)) / 1000;
+  //const moment = require("moment-timezone");
+  //let time = moment().tz("America/New_York").valueOf();
+  //time = (time - (time % 1000)) / 1000;
   //3600 = 1 hour
-  let offset = time - 300;
+  //let offset = time - 300;
 
   let result = await db2(`
         SELECT *
         FROM options_raw
-        WHERE time > ${offset} AND is_processed = false
+        WHERE is_processed = false
+        ORDER BY time ASC
+        LIMIT 5000
         `);
 
   return result;

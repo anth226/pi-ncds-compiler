@@ -11,7 +11,7 @@ export async function getRawData() {
         SELECT *
         FROM options_raw
         WHERE is_processed = false
-        ORDER BY time DESC
+        ORDER BY time ASC
         LIMIT 1000
         `);
 

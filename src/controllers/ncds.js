@@ -5,7 +5,7 @@ export async function getRawData() {
   let time = moment().tz("America/New_York").valueOf();
   time = (time - (time % 1000)) / 1000;
   //3600 = 1 hour
-  let offset = time - 600;
+  let offset = time - 300;
 
   let result = await db2(`
         SELECT *

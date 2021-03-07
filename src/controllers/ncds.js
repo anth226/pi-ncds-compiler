@@ -13,7 +13,7 @@ export async function getRawData() {
         FROM options_raw
         WHERE is_processed = false
         ORDER BY time ASC
-        LIMIT 1000
+        LIMIT 3000
         `);
 
   return result;

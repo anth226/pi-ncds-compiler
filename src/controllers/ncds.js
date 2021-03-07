@@ -1,4 +1,5 @@
 import db2 from "../db2";
+import status, { CONSOLIDATOR_STATUS } from "../redis_status";
 
 export async function getRawData() {
   //const moment = require("moment-timezone");
@@ -29,6 +30,15 @@ export async function getSmartTrade(optContract, time) {
 }
 
 export async function consolidate() {
+  let consolidator_status = await status.get(CONSOLIDATOR_STATUS);
+
+  if (consolidator_status == "ON") {
+    console.log("Consolidator already on, skipping...");
+    return;
+  }
+
+  status.set(CONSOLIDATOR_STATUS, "ON");
+
   let smartTrades = new Map();
 
   let result = await getRawData();
@@ -125,4 +135,5 @@ export async function consolidate() {
       }
     });
   }
+  status.set(CONSOLIDATOR_STATUS, "OFF");
 }

@@ -1,5 +1,6 @@
 import db2 from "../db2";
 import status, { CONSOLIDATOR_STATUS_TEST } from "../redis_status";
+import * as queue from "../queue";
 
 export async function getRawData() {
   // const moment = require("moment-timezone");

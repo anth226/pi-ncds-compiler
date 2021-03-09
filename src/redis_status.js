@@ -3,7 +3,7 @@ import redis from "redis";
 
 let db;
 
-export let CONSOLIDATOR_STATUS = "OFF";
+export let CONSOLIDATOR_STATUS_TEST = "OFF";
 
 function connectDatabase() {
   let credentials = {

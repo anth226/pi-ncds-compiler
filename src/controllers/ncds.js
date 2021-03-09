@@ -47,16 +47,28 @@ export async function consolidate() {
   let result = await getRawData();
 
   if (result && result.length > 0) {
+    let ids = "( ";
+
     for (let i in result) {
       let id = result[i].id;
 
-      //set is_processed to true
-      let query = {
-        text: "UPDATE options_raw_test SET is_processed = true WHERE id = $1",
-        values: [id],
-      };
-      await db2(query);
+      ids += id;
+      ids += ", ";
     }
+
+    ids = ids.substring(0, ids.length - 2);
+
+    ids += " )";
+
+    console.log("ids\n", ids);
+
+    //set is_processed to true
+    let query = {
+      text: "UPDATE options_raw_test SET is_processed = true WHERE id IN $1",
+      values: [ids],
+    };
+    await db2(query);
+
     queue.publish_SmartOptions(result);
   } else {
     console.log("Consolidator polled no result.");

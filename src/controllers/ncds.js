@@ -48,14 +48,32 @@ export async function consolidate() {
   let result = await getRawData();
 
   if (result && result.length > 0) {
+    console.log("Consolidator found data, consolidating...");
+    let smartTrades = new Map();
     let ids = "(";
 
     for (let i in result) {
       let id = result[i].id;
-
       ids += id;
       ids += ",";
+
+      let optContract = result[i].option_contract;
+
+      if (smartTrades.has(optContract)) {
+        let trades = await smartTrades.get(optContract);
+        await trades.push(result[i]);
+        smartTrades.set(optContract, trades);
+      } else {
+        let trades = [];
+        trades.push(result[i]);
+        smartTrades.set(optContract, trades);
+      }
     }
+    console.log("Done consolidating...");
+
+    smartTrades.forEach(async (value, key) => {
+      queue.publish_SmartOptions(value);
+    });
 
     ids = ids.substring(0, ids.length - 1);
 
@@ -67,10 +85,7 @@ export async function consolidate() {
     WHERE id IN ${ids}
     `);
 
-    await status.set(CONSOLIDATOR_STATUS_TEST, "OFF");
-    console.log("Consolidator turned off.");
-
-    await queue.publish_SmartOptions(result);
+    console.log("Done processing..");
   } else {
     console.log("Consolidator polled no result.");
   }

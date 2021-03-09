@@ -31,6 +31,7 @@ export async function getSmartTrade(optContract, time) {
 
 export async function turnOffConsolidator() {
   status.set(CONSOLIDATOR_STATUS_TEST, "OFF");
+  console.log("Consolidator turned off.");
 }
 
 export async function consolidate() {
@@ -60,18 +61,17 @@ export async function consolidate() {
 
     ids += ")";
 
-    //set is_processed to true
-
     await db2(`
     UPDATE options_raw_test
     SET is_processed = true
     WHERE id IN ${ids}
   `);
 
+    status.set(CONSOLIDATOR_STATUS_TEST, "OFF");
+    console.log("Consolidator turned off.");
+
     queue.publish_SmartOptions(result);
   } else {
     console.log("Consolidator polled no result.");
   }
-  status.set(CONSOLIDATOR_STATUS_TEST, "OFF");
-  console.log("Consolidator turned off.");
 }

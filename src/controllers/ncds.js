@@ -29,6 +29,10 @@ export async function getSmartTrade(optContract, time) {
   return result[0];
 }
 
+export async function turnOffConsolidator() {
+  status.set(CONSOLIDATOR_STATUS, "OFF");
+}
+
 export async function consolidate() {
   let consolidator_status = await status.get(CONSOLIDATOR_STATUS);
 
@@ -38,6 +42,7 @@ export async function consolidate() {
   }
 
   status.set(CONSOLIDATOR_STATUS, "ON");
+  console.log("Consolidator turned on...");
 
   let smartTrades = new Map();
 
@@ -136,4 +141,5 @@ export async function consolidate() {
     });
   }
   status.set(CONSOLIDATOR_STATUS, "OFF");
+  console.log("Consolidator turned off.");
 }

@@ -11,7 +11,7 @@ export async function getRawData() {
   let result = await db2(`
     SELECT *
     FROM options_raw_test
-    WHERE time = (SELECT MIN(time) FROM options_raw WHERE is_processed = false) AND is_processed = false
+    WHERE time = (SELECT MIN(time) FROM options_raw_test WHERE is_processed = false) AND is_processed = false
         `);
 
   return result;

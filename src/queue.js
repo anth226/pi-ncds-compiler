@@ -1,5 +1,3 @@
-import axios from "axios";
-
 import * as ncds from "./controllers/ncds";
 
 import db2 from "./db2";

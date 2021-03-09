@@ -44,91 +44,73 @@ export const consumer_1 = Consumer.create({
 
     console.log(sqsMessage);
 
-    let smartTrades = new Map();
-
     let rawTrades = sqsMessage.rawTrades;
 
-    for (let i in rawTrades) {
-      let optContract = rawTrades[i].option_contract;
-      if (smartTrades.has(optContract)) {
-        let trades = smartTrades.get(optContract);
-        trades.push(rawTrades[i]);
-        smartTrades.set(optContract, trades);
-      } else {
-        let trades = [];
-        trades.push(rawTrades[i]);
-        smartTrades.set(optContract, trades);
-      }
+    let ticker = rawTrades[0].ticker;
+    let time = rawTrades[0].time;
+    let exp = rawTrades[0].exp;
+    let strike = rawTrades[0].strike;
+    let cp = rawTrades[0].cp;
+    let spot = rawTrades[0].spot;
+    let type = rawTrades[0].type;
+    let optContract = rawTrades[0].option_contract;
+    let contract_quantity = 0;
+    let total_amount = 0;
+
+    for (let j in rawTrades) {
+      contract_quantity += rawTrades[j].volume;
+      total_amount += rawTrades[j].price * rawTrades[j].volume;
     }
 
-    smartTrades.forEach(async (value, key) => {
-      //console.log("SMART TRADE");
-      let ticker = value[0].ticker;
-      let time = value[0].time;
-      let exp = value[0].exp;
-      let strike = value[0].strike;
-      let cp = value[0].cp;
-      let spot = value[0].spot;
-      let type = value[0].type;
-      let optContract = value[0].option_contract;
-      let contract_quantity = 0;
-      let total_amount = 0;
+    let price_per_contract = total_amount / contract_quantity;
 
-      for (let j in value) {
-        contract_quantity += value[j].volume;
-        total_amount += value[j].price * value[j].volume;
-      }
+    let prem = contract_quantity * price_per_contract * 100;
 
-      let price_per_contract = total_amount / contract_quantity;
+    if (prem < 3000) {
+      return;
+    }
 
-      let prem = contract_quantity * price_per_contract * 100;
+    let smTrade = await ncds.getSmartTrade(optContract, time);
+    //console.log("smTrade", smTrade);
 
-      if (prem < 3000) {
-        return;
-      }
+    if (smTrade) {
+      //update
+      let query = {
+        text:
+          "UPDATE options_test SET contract_quantity = $3, price_per_contract = $4, prem = $5 WHERE option_contract = $1 AND time = $2",
+        values: [
+          optContract,
+          time,
+          contract_quantity,
+          price_per_contract,
+          prem,
+        ],
+      };
 
-      let smTrade = await ncds.getSmartTrade(optContract, time);
-      //console.log("smTrade", smTrade);
-
-      if (smTrade) {
-        //update
-        let query = {
-          text:
-            "UPDATE options_test SET contract_quantity = $3, price_per_contract = $4, prem = $5 WHERE option_contract = $1 AND time = $2",
-          values: [
-            optContract,
-            time,
-            contract_quantity,
-            price_per_contract,
-            prem,
-          ],
-        };
-
-        await db2(query);
-        console.log("smart option trade updated");
-      } else {
-        //insert
-        let query = {
-          text:
-            "INSERT INTO options_test (ticker, time, exp, strike, cp, spot, type, contract_quantity, price_per_contract, prem, option_contract) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
-          values: [
-            ticker,
-            time,
-            exp,
-            strike,
-            cp,
-            spot,
-            type,
-            contract_quantity,
-            price_per_contract,
-            prem,
-            optContract,
-          ],
-        };
-        await db2(query);
-        console.log("smart option trade added");
-      }
-    });
+      await db2(query);
+      console.log("smart option trade updated");
+    } else {
+      //insert
+      let query = {
+        text:
+          "INSERT INTO options_test (ticker, time, exp, strike, cp, spot, type, contract_quantity, price_per_contract, prem, option_contract) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+        values: [
+          ticker,
+          time,
+          exp,
+          strike,
+          cp,
+          spot,
+          type,
+          contract_quantity,
+          price_per_contract,
+          prem,
+          optContract,
+        ],
+      };
+      await db2(query);
+      console.log("smart option trade added");
+    }
   },
 });
 

@@ -47,18 +47,18 @@ export async function consolidate() {
   let result = await getRawData();
 
   if (result && result.length > 0) {
-    let ids = "( ";
+    let ids = "(";
 
     for (let i in result) {
       let id = result[i].id;
 
       ids += id;
-      ids += ", ";
+      ids += ",";
     }
 
-    ids = ids.substring(0, ids.length - 2);
+    ids = ids.substring(0, ids.length - 1);
 
-    ids += " )";
+    ids += ")";
 
     console.log("ids\n", ids);
 

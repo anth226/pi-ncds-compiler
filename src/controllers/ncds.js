@@ -60,13 +60,14 @@ export async function consolidate() {
 
     ids += ")";
 
-    console.log("ids\n", ids);
-
     //set is_processed to true
     let query = {
       text: "UPDATE options_raw_test SET is_processed = true WHERE id IN $1",
       values: [ids],
     };
+
+    console.log("query:\n", query);
+
     await db2(query);
 
     queue.publish_SmartOptions(result);

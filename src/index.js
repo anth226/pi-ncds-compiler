@@ -21,6 +21,8 @@ import bodyParser from "body-parser";
 import * as ncds from "./controllers/ncds";
 //import redis from "./redis";
 
+import * as queue from "./queue";
+
 var bugsnag = require("@bugsnag/js");
 var bugsnagExpress = require("@bugsnag/plugin-express");
 
@@ -100,4 +102,6 @@ app.get("/ncds_consolidate/off", async (req, res) => {
 // Start Server
 app.listen(process.env.PORT || 8080, () => {
   console.log(`listening on ${process.env.PORT || 8080}`);
+
+  queue.consumer_1.start();
 });

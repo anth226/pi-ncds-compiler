@@ -19,6 +19,17 @@ export async function getRawData() {
   return result;
 }
 
+export async function checkUnprocessedRawData() {
+  let result = await db2(`
+    SELECT id, is_processed
+    FROM options_raw_test
+    WHERE is_processed = false
+    LIMIT 1
+        `);
+
+  return result;
+}
+
 export async function getSmartTrade(optContract, time) {
   let result = await db2(`
     SELECT *
@@ -92,4 +103,9 @@ export async function consolidate() {
   }
   await status.set(CONSOLIDATOR_STATUS_TEST, "OFF");
   console.log("Consolidator turned off.");
+
+  let checkProcess = await checkUnprocessedRawData();
+  if (checkProcess.length > 0) {
+    await consolidate();
+  }
 }

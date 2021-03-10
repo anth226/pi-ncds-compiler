@@ -46,8 +46,6 @@ export const consumer_1 = Consumer.create({
 
     let rawTrades = sqsMessage.rawTrades;
 
-    console.log("trades count: ", rawTrades.length());
-
     let ticker = rawTrades[0].ticker;
     let time = rawTrades[0].time;
     let exp = rawTrades[0].exp;
@@ -58,6 +56,15 @@ export const consumer_1 = Consumer.create({
     let optContract = rawTrades[0].option_contract;
     let contract_quantity = 0;
     let total_amount = 0;
+
+    console.log(
+      "trade time: ",
+      time,
+      "trade ticker: ",
+      ticker,
+      "trade optContract: ",
+      optContract
+    );
 
     for (let j in rawTrades) {
       contract_quantity += rawTrades[j].volume;

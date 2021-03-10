@@ -99,6 +99,20 @@ app.get("/ncds_consolidate/off", async (req, res) => {
   res.send("ok");
 });
 
+app.get("/ncds_consolidate/on", async (req, res) => {
+  if (process.env.DISABLE_CRON == "true") {
+    res.send("disabled");
+    return;
+  }
+  let { query } = req;
+  if (query.token != "XXX") {
+    res.send("fail");
+    return;
+  }
+  await ncds.turnOnConsolidator();
+  res.send("ok");
+});
+
 // Start Server
 app.listen(process.env.PORT || 8080, () => {
   console.log(`listening on ${process.env.PORT || 8080}`);

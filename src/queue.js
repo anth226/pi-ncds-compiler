@@ -42,9 +42,11 @@ export const consumer_1 = Consumer.create({
   handleMessage: async (message) => {
     let sqsMessage = JSON.parse(message.Body);
 
-    console.log(sqsMessage);
+    //console.log(sqsMessage);
 
     let rawTrades = sqsMessage.rawTrades;
+
+    console.log("trades count: ", rawTrades.length());
 
     let ticker = rawTrades[0].ticker;
     let time = rawTrades[0].time;
@@ -111,6 +113,7 @@ export const consumer_1 = Consumer.create({
       await db2(query);
       console.log("smart option trade added");
     }
+    console.log("finished raw trade compilation");
   },
 });
 

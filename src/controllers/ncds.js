@@ -71,7 +71,7 @@ export async function consolidate() {
     }
     console.log("!!!\n\n\nDone consolidating...\n\n\n!!!");
 
-    smartTrades.forEach(async (value, key) => {
+    smartTrades.forEach((value, key) => {
       queue.publish_SmartOptions(value);
     });
 
@@ -85,7 +85,8 @@ export async function consolidate() {
     WHERE id IN ${ids}
     `);
 
-    console.log("Done processing..");
+    await status.set(CONSOLIDATOR_STATUS_TEST, "OFF");
+    console.log("Done processing.");
   } else {
     console.log("Consolidator polled no result.");
   }

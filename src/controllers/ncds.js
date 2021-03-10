@@ -13,7 +13,7 @@ export async function getRawData() {
     SELECT *
     FROM options_raw_test
     WHERE time = (SELECT MIN(time) FROM options_raw_test WHERE is_processed = false) AND is_processed = false
-    LIMIT 1000
+    LIMIT 500
         `);
 
   return result;
@@ -69,7 +69,7 @@ export async function consolidate() {
         smartTrades.set(optContract, trades);
       }
     }
-    console.log("Done consolidating...");
+    console.log("!!!\n\n\nDone consolidating...\n\n\n!!!");
 
     smartTrades.forEach(async (value, key) => {
       queue.publish_SmartOptions(value);

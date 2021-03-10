@@ -45,6 +45,11 @@ export async function turnOffConsolidator() {
   console.log("Consolidator turned off.");
 }
 
+export async function turnOnConsolidator() {
+  await status.set(CONSOLIDATOR_STATUS_TEST, "ON");
+  console.log("Consolidator turned on.");
+}
+
 export async function consolidate() {
   let consolidator_status = await status.get(CONSOLIDATOR_STATUS_TEST);
 

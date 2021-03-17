@@ -1,6 +1,8 @@
 import db2 from "../db2";
-import status, { CONSOLIDATOR_STATUS_TEST } from "../redis_status";
+import status from "../redis_status";
 import * as queue from "../queue";
+
+const cons = "CONS-" + process.env.RELEASE_STAGE;
 
 export async function getRawData() {
   // const moment = require("moment-timezone");
@@ -11,9 +13,9 @@ export async function getRawData() {
 
   let result = await db2(`
     SELECT *
-    FROM options_raw_test
-    WHERE time = (SELECT MIN(time) FROM options_raw_test WHERE is_processed = false) AND is_processed = false
-    LIMIT 500
+    FROM options_raw
+    WHERE time = (SELECT MIN(time) FROM options_raw WHERE is_processed = false) AND is_processed = false
+    LIMIT 400
         `);
 
   return result;
@@ -22,7 +24,7 @@ export async function getRawData() {
 export async function checkUnprocessedRawData() {
   let result = await db2(`
     SELECT id, is_processed
-    FROM options_raw_test
+    FROM options_raw
     WHERE is_processed = false
     LIMIT 1
         `);
@@ -33,7 +35,7 @@ export async function checkUnprocessedRawData() {
 export async function getSmartTrade(optContract, time) {
   let result = await db2(`
     SELECT *
-    FROM options_test
+    FROM options
     WHERE option_contract = '${optContract}' AND time = ${time}
     `);
 
@@ -41,72 +43,54 @@ export async function getSmartTrade(optContract, time) {
 }
 
 export async function turnOffConsolidator() {
-  await status.set(CONSOLIDATOR_STATUS_TEST, "OFF");
+  await status.set(cons, "OFF");
   console.log("Consolidator turned off.");
 }
 
 export async function turnOnConsolidator() {
-  await status.set(CONSOLIDATOR_STATUS_TEST, "ON");
+  await status.set(cons, "ON");
   console.log("Consolidator turned on.");
 }
 
 export async function consolidate() {
-  let consolidator_status = await status.get(CONSOLIDATOR_STATUS_TEST);
+  let consolidator_status = await status.get(cons);
 
   if (consolidator_status == "ON") {
     console.log("Consolidator already on, skipping...");
     return;
   }
 
-  await status.set(CONSOLIDATOR_STATUS_TEST, "ON");
+  await status.set(cons, "ON");
   console.log("Consolidator turned on...");
 
   let result = await getRawData();
 
   if (result && result.length > 0) {
-    console.log("Consolidator found data, consolidating...");
-    let smartTrades = new Map();
+    console.log("Consolidator found data, sending to sqs...");
+    
     let ids = "(";
-
     for (let i in result) {
       let id = result[i].id;
       ids += id;
       ids += ",";
-
-      let optContract = result[i].option_contract;
-
-      if (smartTrades.has(optContract)) {
-        let trades = await smartTrades.get(optContract);
-        await trades.push(result[i]);
-        smartTrades.set(optContract, trades);
-      } else {
-        let trades = [];
-        trades.push(result[i]);
-        smartTrades.set(optContract, trades);
-      }
     }
-    console.log("!!!\n\n\nDone consolidating...\n\n\n!!!");
-
-    smartTrades.forEach((value, key) => {
-      queue.publish_SmartOptions(value);
-    });
-
     ids = ids.substring(0, ids.length - 1);
-
     ids += ")";
 
     await db2(`
-    UPDATE options_raw_test
+    UPDATE options_raw
     SET is_processed = true
     WHERE id IN ${ids}
     `);
 
-    await status.set(CONSOLIDATOR_STATUS_TEST, "OFF");
+    await queue.publish_SmartOptions(result);
+
+    await status.set(cons, "OFF");
     console.log("Done processing.");
   } else {
     console.log("Consolidator polled no result.");
   }
-  await status.set(CONSOLIDATOR_STATUS_TEST, "OFF");
+  await status.set(cons, "OFF");
   console.log("Consolidator turned off.");
 
   let checkProcess = await checkUnprocessedRawData();

@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "tower-staging-370f7",
+  "private_key_id": "128581800482af9aaab5be7973b6ec11bad6e7ba",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDU5RJcLV8pq7B9\nUdLrgXaE1LNeeLMgBm8oU34+5lGnFkLZwraFgdWV1Se8N6nw5b1vVaR9+2xy/Sga\nQbqV5+nCGLy/vqjzje77WGsNHefqXNdkkd1atAhB89fI2l0p7ToerkxEsYY1Mktu\nt4T9I8RNnhZ6jAOx8PHFSE4ZLOLlDu80ccUrIs+x15xO3qIic33BRQbQAWcDrbI2\nljoCAJJutPkg+rQLfEDZ9jw3OlDEwbaDoUcGmsBABtU3C2rW4jJz6wM2xo2EqKea\nFN+TwmRkXBTMaK29+88DYZ/V7ehribE8LGGVplZqmc0MV1QLx3pb/0HmhR1WiB4W\nlrR+95BZAgMBAAECggEAQXM7NcNtIi56T8y7/1MJ0MRjcIPC7fGMcuVYRpYgPDIH\n01KdMmY795hUYvTp9flrR7MYovKM4L0bexcB+dwWbWmVfY1r+5SDCBqirqGnDtIE\nFhMR7jSy5TPF/yXCxoT7/Tqwj93T2L7hmeQpqnk4fHRBjONGr4nXikM0X2EBUFG7\nKB4Ces1sZ9mUidx70uVBsRKwCXsfe59cxVETGvkdt67Ll5lr0LXf5IV57Jb2RExh\n9m0CKyZAqIWQENTtyRYa0l0guUp43k3oM02FEuNPGpU+9ZZpOjAyEjGQTE5ToI3C\nwpWflavTyHr0nRxFZutaTMA/+rn/5W/x1e0nmWq4UQKBgQD6rMDb6cVpwTFWieIX\nP6hXXInPphg+X2xTtdhJ6HnvkVm1tyJvblx0zfQSBdfEYQHn8AtZiobQow8E38Pl\nF200RvQZ4XpNBYAIhRMBX28dax/vA+5wIDR80d/II1uw/yfYb7YebmiJF46BmN0Q\nB+4/i7VRGSPAGhHOkHK6MVacUwKBgQDZatvtDorLREfJNQpLXSnt2QL2+JJJ2HdW\n0eJfjlECGTh1SsdM3vhzojn9PQMqnSWHFRkYu9tFEE9gPmnyo01M8l18VgUFLOPt\nLtrUl+9vDLIxIbT1FT9dJBgl5Etea2Yf8qA3HfK3d1kxobdS97EqPmRPF/b02d2l\nFnFC8uDrIwKBgQDn4QuZobpiZDpOccd5eAIxpcE5GsyMTdq36JuFao345LxWUmyB\nJVZTGfxu+4am+pE3yp3FG1YwAtWuzYq5DR2QYR4GHsPyIWdY+jglafEwBlsIztsu\nTyweVkmqKcL0jGKAXH3b0ofSYL8K9Ktw29UwZPy5Ywbl+XeFW6s0vtT+TwKBgQDL\nXHxhe5yvDCrpNMdwPrAdXUK8pzyN/f+CIcdQAdob0GNSsqNAb76MykzbZdo0XdDg\nTQewbuZl7x+PslF/Nufy9TAkQIFpmdeH3q+o8oRupr1130VXiIxAHqbHqoYkxug7\nMcJSS5zfpq6zEcRbwnrgPIOux4ei9rWu2RMPwAZJaQKBgQCQwbdM7RTVZq2jEqrD\ne4RHIxhX5nGg9+WZAjadZGlh3OaJOy0GujWstRftobEphA9P6Vwtm5XkqOunhfXk\nACH5bOe6LP0+zIIASKXlw5WJjGvG5HALP9rl7kxiDi7ifJn/mM7sskBNN9JSxSnV\n8ycIAgV3RtVD0KXK7tonzCz7Hw==\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-35cq8@tower-staging-370f7.iam.gserviceaccount.com",
+  "client_id": "115430821001274866616",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-35cq8%40tower-staging-370f7.iam.gserviceaccount.com"
+}

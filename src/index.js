@@ -19,6 +19,7 @@ import bodyParser from "body-parser";
 // import * as nlp from "./controllers/nlp";
 // import * as userPortfolios from "./controllers/userportfolios";
 import * as ncds from "./controllers/ncds";
+import * as publish from "./controllers/publish"
 //import redis from "./redis";
 
 import * as queue from "./queue";
@@ -113,9 +114,73 @@ app.get("/ncds_consolidate/on", async (req, res) => {
   res.send("ok");
 });
 
+app.get("/send_test", async (req, res) => {
+  let { query } = req;
+  let rnd = Math.floor(Math.random() * Math.floor(100))
+  let trade = {price: rnd, strike: rnd*2, message: query.message}
+  await publish.sendToTopic(trade);
+  res.send("sent");
+});
+
+app.get("/send_trade", async (req, res) => {
+  let { query } = req;
+
+  let trade = {
+    time: "1615839282",
+    ticker: "IWM",
+    exp: "2021-03-19T00:00:00.000Z",
+    strike: "222",
+    cp: "P",
+    spot: "234.26",
+    contract_quantity: 98,
+    price_per_contract: "0.47",
+    type: "SWEEP",
+    prem: "4605.999999999999"
+  }
+
+  if (query.ticker && query.ticker.length > 0) {
+    trade.ticker = query.ticker;
+  }
+
+  if (query.time && query.time.length > 0) {
+    if (query.time === "NOW") {
+      trade.time = String(Math.round(Date.now() / 1000));
+    } else {
+      trade.time = query.time;
+    }
+  }
+
+  if (query.exp && query.exp.length > 0) {
+    trade.exp = query.exp;
+  }
+
+  await publish.sendToTopic(trade);
+  res.send("sent");
+});
+
+app.get("/send_trades", async (req, res) => {
+  let { query } = req;
+
+  let count;
+  if (query.count && query.count.length > 0) {
+      count = parseInt(query.count);
+  }
+
+  let shouldBatch = false;
+  if (query.shouldBatch && query.shouldBatch.length > 0) {
+    shouldBatch = query.shouldBatch;
+  }
+
+  await publish.sendMultipleTrades(count, shouldBatch);
+
+  res.send("sent");
+});
+
 // Start Server
 app.listen(process.env.PORT || 8080, () => {
   console.log(`listening on ${process.env.PORT || 8080}`);
 
-  queue.consumer_1.start();
+  if (process.env.IS_NODE == "true"){
+    queue.consumer_1.start();
+  }
 });

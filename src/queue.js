@@ -1,12 +1,29 @@
 import * as ncds from "./controllers/ncds";
+import * as publish from "./controllers/publish"
 
 import db2 from "./db2";
+import {sendToTopic} from "./controllers/publish";
 
 const { Consumer } = require("sqs-consumer");
 
 const AWS = require("aws-sdk");
 AWS.config.update({ region: "us-east-1" });
 const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
+
+export function formatTrade(ticker, time, exp, strike, cp, spot, type, contract_quantity, price_per_contract, prem) {
+  return {
+  ticker: ticker,
+  time: time,
+  exp: exp,
+  strike: strike,
+  cp: cp,
+  spot: spot,
+  type: type,
+  contract_quantity: contract_quantity,
+  price_per_contract: price_per_contract,
+  prem: prem
+  }
+};
 
 export function publish_SmartOptions(rawTrades) {
   let queueUrl = process.env.AWS_SQS_URL_SMART_OPTIONS;
@@ -46,81 +63,124 @@ export const consumer_1 = Consumer.create({
 
     let rawTrades = sqsMessage.rawTrades;
 
-    let ticker = rawTrades[0].ticker;
-    let time = rawTrades[0].time;
-    let exp = rawTrades[0].exp;
-    let strike = rawTrades[0].strike;
-    let cp = rawTrades[0].cp;
-    let spot = rawTrades[0].spot;
-    let type = rawTrades[0].type;
-    let optContract = rawTrades[0].option_contract;
-    let contract_quantity = 0;
-    let total_amount = 0;
+    let smartTrades = new Map();
 
-    console.log(
-      "trade time: ",
-      time,
-      "trade ticker: ",
-      ticker,
-      "trade optContract: ",
-      optContract
-    );
-
-    for (let j in rawTrades) {
-      contract_quantity += rawTrades[j].volume;
-      total_amount += rawTrades[j].price * rawTrades[j].volume;
+    for (let i in rawTrades) {
+      let optContract = rawTrades[i].option_contract;
+      if (smartTrades.has(optContract)) {
+        let trades = await smartTrades.get(optContract);
+        await trades.push(rawTrades[i]);
+        smartTrades.set(optContract, trades);
+      } else {
+        let trades = [];
+        trades.push(rawTrades[i]);
+        smartTrades.set(optContract, trades);
+      }
     }
 
-    let price_per_contract = total_amount / contract_quantity;
+    let smartTradesSize = smartTrades.size;
+    let batch = [];
+    let i = 0;
 
-    let prem = contract_quantity * price_per_contract * 100;
+    smartTrades.forEach( async (value, key) => {
+      let ticker = value[0].ticker;
+      let time = value[0].time;
+      let exp = value[0].exp;
+      let strike = value[0].strike;
+      let cp = value[0].cp;
+      let spot = value[0].spot;
+      let type = value[0].type;
+      let optContract = value[0].option_contract;
+      let contract_quantity = 0;
+      let total_amount = 0;
 
-    if (prem < 3000) {
-      return;
-    }
+      console.log(
+        "trade time: ",
+        time,
+        "trade ticker: ",
+        ticker,
+        "trade optContract: ",
+        optContract
+      );
 
-    let smTrade = await ncds.getSmartTrade(optContract, time);
-    //console.log("smTrade", smTrade);
+      for (let j in value) {
+        contract_quantity += value[j].volume;
+        total_amount += value[j].price * value[j].volume;
+      }
 
-    if (smTrade) {
-      //update
-      let query = {
-        text:
-          "UPDATE options_test SET contract_quantity = $3, price_per_contract = $4, prem = $5 WHERE option_contract = $1 AND time = $2",
-        values: [
-          optContract,
-          time,
-          contract_quantity,
-          price_per_contract,
-          prem,
-        ],
-      };
+      let price_per_contract = total_amount / contract_quantity;
 
-      await db2(query);
-      console.log("smart option trade updated");
-    } else {
-      //insert
-      let query = {
-        text:
-          "INSERT INTO options_test (ticker, time, exp, strike, cp, spot, type, contract_quantity, price_per_contract, prem, option_contract) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
-        values: [
-          ticker,
-          time,
-          exp,
-          strike,
-          cp,
-          spot,
-          type,
-          contract_quantity,
-          price_per_contract,
-          prem,
-          optContract,
-        ],
-      };
-      await db2(query);
-      console.log("smart option trade added");
-    }
-    console.log("finished raw trade compilation");
+      let prem = contract_quantity * price_per_contract * 100;
+
+      if (prem < 3000) {
+        return;
+      }
+
+      let smTrade = await ncds.getSmartTrade(optContract, time);
+      //console.log("smTrade", smTrade);
+
+      let formattedTrade = formatTrade(ticker, time, exp, strike, cp, spot, type, contract_quantity, price_per_contract, prem);
+
+      if (smTrade) {
+        //update
+        let query = {
+          text:
+            "UPDATE options SET contract_quantity = $3, price_per_contract = $4, prem = $5 WHERE option_contract = $1 AND time = $2",
+          values: [
+            optContract,
+            time,
+            contract_quantity,
+            price_per_contract,
+            prem,
+          ],
+        };
+
+        await db2(query);
+        console.log("smart option trade updated");
+
+        // TODO: Push updates as messages (searching the large array of data on frontend
+        // console.log("Sending trade update to frontend");
+        // publish.sendToTopic(formattedTrade);
+
+      } else {
+        //insert
+        let query = {
+          text:
+            "INSERT INTO options (ticker, time, exp, strike, cp, spot, type, contract_quantity, price_per_contract, prem, option_contract) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+          values: [
+            ticker,
+            time,
+            exp,
+            strike,
+            cp,
+            spot,
+            type,
+            contract_quantity,
+            price_per_contract,
+            prem,
+            optContract,
+          ],
+        };
+        await db2(query);
+        console.log("smart option trade added");
+        if (batch.length < 5) {
+          batch.push(formattedTrade);
+        } else {
+          console.log("Sending new trade to frontend");
+          console.log("Send batch: ", batch);
+          sendToTopic(batch);
+          batch = [value];
+        }
+      }
+
+      i += 1;
+      if (i === smartTradesSize) {
+        console.log("Send last: ", batch);
+        sendToTopic(batch);
+      }
+
+      console.log("finished raw trade compilation");
+    });
   },
 });
 

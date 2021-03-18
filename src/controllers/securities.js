@@ -538,7 +538,13 @@ const createCompany = async (security) => {
 
   const logoSource = logo ? 'brandfetch' : null;
 
-  console.log(logo);
+  if (!security.name && companyDetails.name) {
+    await db({
+      text:
+        "UPDATE securities SET name = $1 WHERE ticker = $2",
+      values: [companyDetails.name, security.ticker],
+    });
+  }
 
   return db({
     text:

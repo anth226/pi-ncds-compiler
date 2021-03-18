@@ -155,7 +155,7 @@ export const getPinnedPortfolios = async () => {
     SELECT portfolios.id
     from portfolios
     JOIN portfolio_histories ON portfolios.id = portfolio_histories.portfolio_id 
-    WHERE close_date is null and type in ('common_stock', 'etf') GROUP BY portfolios.id
+    WHERE close_date is null and type in ('common_stock', 'etf', 'mutual_fund') GROUP BY portfolios.id
   `);
   return result
 }
